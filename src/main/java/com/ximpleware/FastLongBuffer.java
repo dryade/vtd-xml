@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ public class FastLongBuffer implements ILongBuffer {
     /* bufferArrayList is a resizable array list of int buffers
      *
      */
-    private ArrayList bufferArrayList;
+    private arrayList bufferArrayList;
 
     /**
     * Total capacity of the IntBuffer
@@ -43,7 +43,7 @@ public class FastLongBuffer implements ILongBuffer {
     /**
     	 * Total number of integers in the IntBuffer
     */
-    private int size;
+    protected int size;
     private int exp;
     private int r;
 
@@ -56,7 +56,7 @@ public class FastLongBuffer implements ILongBuffer {
         pageSize = 1024;
         exp = 10;
         r = 1023;
-        bufferArrayList = new ArrayList();
+        bufferArrayList = new arrayList();
     }
 /**
  * Construct a FastLongBuffer instance with specified page size
@@ -70,7 +70,7 @@ public FastLongBuffer(int e) {
     pageSize = (1<<e);
     exp = e;
     r = pageSize -1;
-    bufferArrayList = new ArrayList();
+    bufferArrayList = new arrayList();
 }
 
 /**
@@ -86,7 +86,7 @@ public FastLongBuffer(int e,int c) {
     pageSize = (1<<e);
     exp = e;
     r = pageSize -1;
-    bufferArrayList = new ArrayList(c);
+    bufferArrayList = new arrayList(c);
 }
 /**
  * Append single long to the end of array buffer.
@@ -99,15 +99,15 @@ public void append(long[] long_array) {
     // no additional buffer space needed
     int lastBufferIndex;
     long[] lastBuffer;
-    if (bufferArrayList.size() == 0) {
+    if (bufferArrayList.size == 0) {
         lastBuffer = new long[pageSize];
         bufferArrayList.add(lastBuffer);
         lastBufferIndex = 0;
         capacity = pageSize;
     } else {
         lastBufferIndex = Math.min((size>>exp),//+(((size&r)==0)? 0:1), 
-                bufferArrayList.size() - 1);
-        lastBuffer = (long[]) bufferArrayList.get(lastBufferIndex);
+                bufferArrayList.size - 1);
+        lastBuffer = (long[]) bufferArrayList.oa[lastBufferIndex];
     }
 
     if ((this.size + long_array.length) < this.capacity) {
@@ -126,11 +126,11 @@ public void append(long[] long_array) {
             int k = (l)>> exp;
             int z;
             for (z=1;z<=k;z++){
-                System.arraycopy(long_array,offset,(long[]) bufferArrayList.get(lastBufferIndex+z), 0, pageSize);
+                System.arraycopy(long_array,offset,(long[]) bufferArrayList.oa[lastBufferIndex+z], 0, pageSize);
                 offset += pageSize;
             }
             // copy the last part
-            System.arraycopy(long_array,offset,(long[]) bufferArrayList.get(lastBufferIndex+z), 0, l & r);
+            System.arraycopy(long_array,offset,(long[]) bufferArrayList.oa[lastBufferIndex+z], 0, l & r);
         }
         size += long_array.length;
         return;
@@ -183,26 +183,27 @@ public void append(long[] long_array) {
  * Append an integer to the end of this array buffer
  * @param i long
  */
-public void append(long i) {
-   long[] lastBuffer;
-   int lastBufferIndex;
-    if (bufferArrayList.size() == 0) {
+public final void append(long i) {
+   //long[] lastBuffer;
+   //int lastBufferIndex;
+    /*if (bufferArrayList.size == 0) {
         lastBuffer = new long[pageSize];
         bufferArrayList.add(lastBuffer);
         capacity = pageSize;
     } else {
         lastBufferIndex = Math.min((size>>exp),//+(((size&r)==0)? 0:1), 
-                bufferArrayList.size() - 1);
-        lastBuffer = (long[]) bufferArrayList.get(lastBufferIndex);
+                bufferArrayList.size - 1);
+        lastBuffer = (long[]) bufferArrayList.oa[lastBufferIndex];
         //lastBuffer = (long[]) bufferArrayList.get(bufferArrayList.size() - 1);
-    }
+    }*/
     if (this.size  < this.capacity) {
         //get the last buffer from the bufferListArray
         //obtain the starting offset in that buffer to which the data is to be copied
         //update length
         //System.arraycopy(long_array, 0, lastBuffer, size % pageSize, long_array.length);
         //lastBuffer[size % pageSize] = i;
-        lastBuffer[size & r] = i;
+    	((long[]) bufferArrayList.oa[size >> exp])[size & r] = i;
+        //((long[])bufferArrayList.oa[bufferArrayList.size-1])[size & r] = i;
         size += 1;
     } else // new buffers needed
         {
@@ -217,7 +218,7 @@ public void append(long i) {
  * Get the capacity of the buffer.
  * @return int
  */
-public int getCapacity() {
+public final int getCapacity() {
 	return capacity;
 }
 /**
@@ -230,7 +231,7 @@ public long[] getLongArray(int startingOffset, int len) {
     if (size <= 0 || startingOffset < 0) {
         throw (new IllegalArgumentException());
     }
-    if ((startingOffset + len) > size()) {
+    if ((startingOffset + len) > size) {
         throw (new IndexOutOfBoundsException());
     }
 
@@ -247,7 +248,7 @@ public long[] getLongArray(int startingOffset, int len) {
     if (first_index == last_index) {
         // to see if there is a need to go across buffer boundry
         System.arraycopy(
-            (long[]) (bufferArrayList.get(first_index)),
+            (long[]) (bufferArrayList.oa[first_index]),
 //            startingOffset % pageSize,
 			startingOffset & r,
             result,
@@ -256,7 +257,7 @@ public long[] getLongArray(int startingOffset, int len) {
     } else {
         int long_array_offset = 0;
         for (int i = first_index; i <= last_index; i++) {
-            long[] currentChunk = (long[]) bufferArrayList.get(i);
+            long[] currentChunk = (long[]) bufferArrayList.oa[i];
             if (i == first_index) // first section
                 {
                 System.arraycopy(
@@ -290,7 +291,7 @@ public long[] getLongArray(int startingOffset, int len) {
  * Get the buffer page size.
  * @return int
  */
-public int getPageSize() {
+public final int getPageSize() {
 	return pageSize;
 }
 /**
@@ -298,48 +299,48 @@ public int getPageSize() {
  * @return long
  * @param index int
  */
-public long longAt(int index) {
-    /*if (index < 0 || index > size()) {
+public final long longAt(int index) {
+    /*if (index >= size) {
         throw new IndexOutOfBoundsException();
     }*/
     int pageNum = (index >> exp);
     // int offset = index % r;
     int offset = index &r;
-    return ((long[]) bufferArrayList.get(pageNum))[offset];
+    return ((long[]) bufferArrayList.oa[pageNum])[offset];
 }
 /**
  * Get the lower 32 bit of the integer at the given index.
  * @return int
  * @param index int
  */
- public int lower32At(int index) {
-    if (index < 0 || index > size()) {
+ public final int lower32At(int index) {
+    /*if ( index > size) {
         throw new IndexOutOfBoundsException();
-    }
+    }*/
     int pageNum =  (index >> exp);
     // int offset = index % pageSize;
     int offset = index & r;
-    return (int) ((long[]) bufferArrayList.get(pageNum))[offset];
+    return (int) ((long[]) bufferArrayList.oa[pageNum])[offset];
 }
 /**
  * Modify the value at the index to a new val.
  * @param index int
  * @param newValue long
  */
-public void modifyEntry(int index, long newValue) {
+public final void modifyEntry(int index, long newValue) {
 
-    if (index < 0 || index > size + 1) {
+    /*if ( index > size + 1) {
         throw new IndexOutOfBoundsException();
-    }
+    }*/
     //((long[]) bufferArrayList.get((int) (index / pageSize)))[index % pageSize] =
-    ((long[]) bufferArrayList.get(index >> exp))[index & r] =
+    ((long[]) bufferArrayList.oa[index >> exp])[index & r] =
         newValue;
 }
 /**
  * Get the total number of longs in the buffer.
  * @return int
  */
-public int size() {
+public final int size() {
 	return size;
 }
 /**
@@ -354,7 +355,7 @@ public long[] toLongArray() {
         int array_offset = 0;
         for (int i = 0; s>0; i++) {
             System.arraycopy(
-                (long[]) bufferArrayList.get(i),
+                (long[]) bufferArrayList.oa[i],
                 0,
                 resultArray,
                 array_offset,
@@ -373,14 +374,14 @@ public long[] toLongArray() {
  * @return int
  * @param index int
  */
-public int upper32At(int index) {
-    if (index < 0 || index >= size()) {
+public final int upper32At(int index) {
+    /*if ( index >= size) {
         throw new IndexOutOfBoundsException();
-    }
+    }*/
     int pageNum = (index >>exp);
     int offset = index & r;
     return (int)
-        ((((long[]) bufferArrayList.get(pageNum))[offset] & (0xffffffffL << 32)) >> 32);
+        ((((long[]) bufferArrayList.oa[pageNum])[offset] & (0xffffffffL << 32)) >> 32);
 
 }
 
@@ -391,8 +392,24 @@ public int upper32At(int index) {
   * any unnecessary and additional allocation
   *
   */
- public void clear(){
+ public final void clear(){
  	size = 0;
+ }
+ 
+ /**
+  * Set the size of FastLongBuffer to newSz if newSz is less than the
+  * capacity, otherwise return false
+  * @param newSz
+  * @return status of resize
+  *
+  */
+ public final boolean resize(int newSz){     
+	 if (newSz <= capacity && newSz >=0){
+		 size = newSz;
+		 return true;
+	 }	 
+	 else
+		 return false;       
  }
 }
 

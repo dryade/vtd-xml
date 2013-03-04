@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package com.ximpleware;
  * This exception is for any exception conditions during navigation phase.
  * Creation date: (11/19/03 11:42:28 AM)
  */
-public class NavException extends Exception {
+public class NavException extends VTDException {
 /**
  * NavException constructor comment.
  */

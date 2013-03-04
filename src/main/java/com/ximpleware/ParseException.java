@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package com.ximpleware;
  * This class is for any exception condition in the parsing phase.
  * Creation date: (11/19/03 11:43:03 AM)
  */
-public class ParseException extends Exception {
+public class ParseException extends VTDException {
 /**
  * ParseException constructor comment.
  */

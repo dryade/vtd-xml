@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,11 @@
 package com.ximpleware;
 
 /**
- * @author jimmy zhang
- *
- * TODO To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
+ * IndexReadException is thrown when there are exception 
+ * conditions during index loading
  */
-public class IndexReadException extends Exception {
+public class IndexReadException extends VTDException {
     public IndexReadException(String s){
         super(s);
     }

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@ package com.ximpleware;
 /**
  * A simple wrapper around monolithic byte array implementing IByteBuffer interface.
  * Creation date: (11/25/03 5:05:57 PM)
- * @author: 
  */
 public class UniByteBuffer implements IByteBuffer {
     private byte[] ba;
@@ -39,7 +38,7 @@ public UniByteBuffer(byte[] b) {
  * @return byte
  * @param index int
  */
-public byte byteAt(int index) {
+public final byte byteAt(int index) {
 	return (byte) ba[index];
 }
 /**
@@ -49,7 +48,7 @@ public byte byteAt(int index) {
  * @param offset int
  * @param len int
  */
-public byte[] getBytes(int offset, int len) {
+public final byte[] getBytes(int offset, int len) {
     byte[] b = new byte[len];
     System.arraycopy(ba, offset, b, 0, len);
     return b;
@@ -65,7 +64,7 @@ public int length() {
 
 /**
  * Return the byte array containing the original XML document
- * @return
+ * @return byte[]
  *
  */
 public byte[] getBytes(){

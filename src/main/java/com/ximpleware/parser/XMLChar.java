@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ public class XMLChar {
     //
 
     /** Character flags. */
-    private static final byte[] UNI_CHARS = new byte[0x10000];
+    public static final byte[] UNI_CHARS = new byte[0x10000];
 
     /** Valid character mask. */
     public static final int XML_VALID = 0x01;
@@ -460,8 +460,9 @@ public class XMLChar {
      * @param c The character to check.
      */
     public static boolean isSpaceChar(int c) {
-        return c < 0x10000 && (UNI_CHARS[c] & XML_SPACE) != 0;
+        return c <= 0x20 && (UNI_CHARS[c] & XML_SPACE) != 0;
     }
+   
     /**
      * Returns true if the specified character is a supplemental character.
      *

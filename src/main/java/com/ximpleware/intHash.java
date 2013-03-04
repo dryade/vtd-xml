@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class intHash {
             return true;
         }        
         else{
-            int size = storage[temp].size();
+            int size = storage[temp].size;
             for (int j=0;j<size;j++){
                 if (i == storage[temp].intAt(j)){
                     return false;
@@ -58,16 +58,45 @@ class intHash {
             return true;            
         }
     }
+    
+    
+    /**
+     * This function differs from isUnique(int i) in that it doesn't insert i into
+     * intHash if it is unique, use to implement intersection or difference of nodesets
+     * @param i
+     * @return
+     */
+    public boolean _isUnique(int i){
+        int temp = i & mask1;
+        if (temp>maxDepth){
+            maxDepth = temp;
+        }
+        if (storage[temp]==null) {
+            //storage[temp]= new FastIntBuffer(pageSizeE);
+            //storage[temp].append(i);
+            return true;
+        }        
+        else{
+            int size = storage[temp].size;
+            for (int j=0;j<size;j++){
+                if (i == storage[temp].intAt(j)){
+                    return false;
+                }
+            }
+            //storage[temp].append(i);
+            return true;            
+        }
+    }
 
     /**
      * Clear all entries in the hash table
      * This method sets the size of member FastIntBuffer
      * to zero
      */
-    public void reset(){
+    final public void reset(){
         for (int i=0;i<=maxDepth;i++){
             if (storage[i]!=null){
-                storage[i].clear();
+                storage[i].size=0;
             }
         }
     }
@@ -117,6 +146,26 @@ class intHash {
     		return 10;
     	if (i<(1<<16))
     		return 11;
-    	return 12;
+    	if (i<(1<<17))
+    	    return 12;
+       	if (i<(1<<18))
+    	    return 13;
+       	if (i<(1<<19))
+    	    return 14;
+       	if (i<(1<<20))
+    	    return 15;
+       	if (i<(1<<21))
+    	    return 16;
+       	if (i<(1<<22))
+    	    return 17;
+       	if (i<(1<<23))
+    	    return 18;
+       	if (i<(1<<25))
+    	    return 19;
+       	if (i<(1<<27))
+       	    return 20;
+       	if (i<(1<<29))
+       	    return 21;
+       	return 22;
     }
 }

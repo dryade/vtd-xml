@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,9 @@ public class FastIntBuffer implements IIntBuffer {
     /* bufferArrayList is a resizable array list of int buffers
      *
      */
-    private ArrayList bufferArrayList;
+	public final static int ASCENDING = 0;
+	public final static int DESCENDING = 1;
+    private arrayList bufferArrayList;
 
     /**
     * Total capacity of the IntBuffer
@@ -45,7 +47,7 @@ public class FastIntBuffer implements IIntBuffer {
     /**
     * Total number of integers in the IntBuffer
     */
-    private int size;
+    protected int size;
     private int exp;
     private int r;
     /**
@@ -57,10 +59,11 @@ public class FastIntBuffer implements IIntBuffer {
         pageSize = 1024;
         exp = 10;
         r = 1023;
-        bufferArrayList = new ArrayList();
+        bufferArrayList = new arrayList();
     }
     /**
      * Constructor with adjustable buffer page size of the value bfz
+     * The actually page size is 1<<e
      * @param e int  is the size of the internal buffer
      */
     public FastIntBuffer(int e) {
@@ -71,28 +74,28 @@ public class FastIntBuffer implements IIntBuffer {
         pageSize = 1<<e;
         exp = e;
         r = pageSize -1;
-        bufferArrayList = new ArrayList();
+        bufferArrayList = new arrayList();
     }
 /**
  * Append an int array to the end of this buffer instance
  * @param int_array int[]
  */
-public void append(int[] int_array) {
-    if (int_array == null) {
+public final void append(int[] int_array) {
+    /*if (int_array == null) {
         throw new NullPointerException();
-    }
+    }*/
     // no additional buffer space needed
     int lastBufferIndex;
     int[] lastBuffer;
     
-    if (bufferArrayList.size() == 0) {
+    if (bufferArrayList.size == 0) {
         lastBuffer = new int[pageSize];
         bufferArrayList.add(lastBuffer);
         lastBufferIndex = 0;
         capacity = pageSize;
     } else {
         lastBufferIndex = Math.min((size>>exp),//+(((size&r)==0)? 0:1), 
-                bufferArrayList.size() - 1);
+                bufferArrayList.size - 1);
         lastBuffer = (int[]) bufferArrayList.get(lastBufferIndex);
     }
 
@@ -175,26 +178,27 @@ public void append(int[] int_array) {
  * Append a single int to the end of this buffer Instance
  * @param i int
  */
-public void append(int i) {
+public final void append(int i) {
 
-    int[] lastBuffer;
-    int lastBufferIndex;
-    if (bufferArrayList.size() == 0) {
+    //int[] lastBuffer;
+    //int lastBufferIndex;
+    /*if (bufferArrayList.size == 0) {
         lastBuffer = new int[pageSize];
         bufferArrayList.add(lastBuffer);
         capacity = pageSize;
     } else {
         lastBufferIndex = Math.min((size>>exp),//+(((size&r)==0)? 0:1), 
-                bufferArrayList.size() - 1);
-        lastBuffer = (int[]) bufferArrayList.get(lastBufferIndex);
+                bufferArrayList.size - 1);
+        lastBuffer = (int[]) bufferArrayList.oa[lastBufferIndex];
         //lastBuffer = (int[]) bufferArrayList.get(bufferArrayList.size() - 1);
-    }
-    if ((this.size + 1) <= this.capacity) {
+    }*/
+    if (this.size < this.capacity) {
         //get the last buffer from the bufferListArray
         //obtain the starting offset in that buffer to which the data is to be copied
         //update length
         //System.arraycopy(long_array, 0, lastBuffer, size % pageSize, long_array.length);
-        lastBuffer[size & r] = i;
+    	((int[]) bufferArrayList.oa[size >> exp])[size & r] = i; 
+    	//((int[])bufferArrayList.oa[bufferArrayList.size-1])[size & r] = i;
 //        lastBuffer[size % pageSize] = i;
         size += 1;
     } else // new buffers needed
@@ -210,7 +214,7 @@ public void append(int i) {
  * Returns the total allocated capacity of this buffer instance.
  * @return int
  */
-public int getCapacity() {
+public final int getCapacity() {
     return capacity;
 }
 /**
@@ -224,7 +228,7 @@ public int[] getIntArray(int startingOffset, int len) {
     if (size <= 0 || startingOffset < 0) {
         throw (new IllegalArgumentException());
     }
-    if ((startingOffset + len) > size()) {
+    if ((startingOffset + len) > size) {
         throw (new IndexOutOfBoundsException());
     }
     int[] result = new int[len]; // allocate result array
@@ -287,7 +291,7 @@ public int[] getIntArray(int startingOffset, int len) {
  * Creation date: (7/17/03 6:38:02 PM)
  * @return int
  */
-public int getPageSize() {
+public final int getPageSize() {
 	return pageSize;
 }
 /**
@@ -295,10 +299,10 @@ public int getPageSize() {
  * @return int
  * @param index int
  */
-public int intAt(int index) {
-    if (index < 0 || index > size()-1) {
+public final int intAt(int index) {
+    /*if (index > size-1) {
         throw new IndexOutOfBoundsException();
-    }
+    }*/
 //    int pageNum = (int) index / pageSize;
     int pageNum = index>>exp;
     //System.out.println("page Number is "+pageNum); 
@@ -311,14 +315,14 @@ public int intAt(int index) {
  * @param index int
  * @param newValue int
  */
-public void modifyEntry(int index, int newValue) {
+public final void modifyEntry(int index, int newValue) {
 	
-        if (index < 0 || index > size - 1) {
-            throw new IndexOutOfBoundsException();
-        }
+        /*if (index > size - 1) {
+            throw new IndexOutOfBoundsException(" index out of range");
+        }*/
 
 //        ((int[]) bufferArrayList.get((int) (index / pageSize)))[index % pageSize] =
-        ((int[]) bufferArrayList.get((index >> exp)))[index & r] =
+        ((int[]) bufferArrayList.oa[index >> exp])[index & r] =
             newValue;
 	
 	}
@@ -326,7 +330,7 @@ public void modifyEntry(int index, int newValue) {
  * Returns the total number of int values in the buffer instance
  * @return int
  */
-public int size() {
+public final int size() {
 	return size;
 }
 /**
@@ -362,8 +366,102 @@ public int[] toIntArray() {
   * any unnecessary and additional allocation
   *
   */
- public void clear(){
+ public final void clear(){
  	size = 0;
  }
  
+ /**
+  * Set the size of FastIntBuffer to newSz if newSz is less than the
+  * capacity, otherwise return false
+  * @param newSz
+  * @return status of resize
+  *
+  */
+ public final boolean resize(int newSz){     
+	 if (newSz <= capacity && newSz >=0){
+		 size = newSz;
+		 return true;
+	 }	 
+	 else
+		 return false;       
+ }
+ 
+ /**
+  * Sort the integers in the buffer 
+  * @param order (as of version 2.9) 
+  * it can be either ASCENDING or DESCENDING
+  */
+	public void sort(int order) {
+		switch (order) {
+		case ASCENDING:
+			if (size > 0)
+				quickSort_ascending(0, size - 1);
+			break;
+		case DESCENDING:
+			if (size > 0)
+				quickSort_descending(0, size - 1);
+			break;
+		default:
+			throw new IllegalArgumentException("Sort type undefined");
+		}
+
+	}
+ 
+ void quickSort_ascending (int lo, int hi)
+ {
+//   lo is the lower index, hi is the upper index
+//   of the region of array a that is to be sorted
+     //System.out.println("lo ==>"+lo);
+     //System.out.println("hi ==>"+hi);
+     int i=lo, j=hi; 
+     int h;
+     //Object o;
+     int x=this.intAt((lo+hi)/2);
+     //  partition
+     do
+     {    
+         while (intAt(i)<x) i++; 
+         while (intAt(j)>x) j--;
+         if (i<=j)
+         {
+             h=this.intAt(i);
+             modifyEntry(i,this.intAt(j)); 
+             modifyEntry(j,h);   
+             i++; 
+             j--;
+         }
+     } while (i<=j);
+     //  recursion
+     if (lo<j) quickSort_ascending(lo, j);
+     if (i<hi) quickSort_ascending(i, hi);
+ }
+ 
+ void quickSort_descending (int lo, int hi)
+ {
+//   lo is the lower index, hi is the upper index
+//   of the region of array a that is to be sorted
+     //System.out.println("lo ==>"+lo);
+     //System.out.println("hi ==>"+hi);
+     int i=lo, j=hi; 
+     int h;
+     //Object o;
+     int x=this.intAt((lo+hi)/2);
+     //  partition
+     do
+     {    
+         while (intAt(i)>x) i++; 
+         while (intAt(j)<x) j--;
+         if (i<=j)
+         {
+             h=this.intAt(i);
+             modifyEntry(i,this.intAt(j)); 
+             modifyEntry(j,h);   
+             i++; 
+             j--;
+         }
+     } while (i<=j);
+     //  recursion
+     if (lo<j) quickSort_descending(lo, j);
+     if (i<hi) quickSort_descending(i, hi);
+ }
 }

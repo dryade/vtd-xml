@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ public class FastObjectBuffer implements IObjectBuffer {
     /* bufferArrayList is a resizable array list of int buffers
     *
     */
-   private ArrayList bufferArrayList;
+   private arrayList bufferArrayList;
 
    /**
    * Total capacity of the ObjectBuffer
@@ -42,7 +42,7 @@ public class FastObjectBuffer implements IObjectBuffer {
    /**
    * Total number of objects in the IntBuffer
    */
-   private int size;
+   protected int size;
    private int exp;
    private int r;
    /**
@@ -54,7 +54,7 @@ public class FastObjectBuffer implements IObjectBuffer {
        pageSize = 1024;
        exp = 10;
        r = 1023;
-       bufferArrayList = new ArrayList();
+       bufferArrayList = new arrayList();
    }
    /**
     * Constructor with adjustable buffer page size of the value bfz
@@ -68,7 +68,7 @@ public class FastObjectBuffer implements IObjectBuffer {
        pageSize = 1<<e;
        exp = e;
        r = pageSize -1;
-       bufferArrayList = new ArrayList();
+       bufferArrayList = new arrayList();
    }
 /**
 * Append an object array to the end of this buffer instance
@@ -82,14 +82,14 @@ public void append(Object[] obj_array) {
    int lastBufferIndex;
    Object[] lastBuffer;
    
-   if (bufferArrayList.size() == 0) {
+   if (bufferArrayList.size == 0) {
        lastBuffer = new Object[pageSize];
        bufferArrayList.add(lastBuffer);
        lastBufferIndex = 0;
        capacity = pageSize;
    } else {
        lastBufferIndex = Math.min((size>>exp),//+(((size&r)==0)? 0:1), 
-               bufferArrayList.size() - 1);
+               bufferArrayList.size - 1);
        lastBuffer = (Object[]) bufferArrayList.get(lastBufferIndex);
    }
 
@@ -172,26 +172,26 @@ public void append(Object[] obj_array) {
 * Append a single object to the end of this buffer Instance
 * @param obj
 */
-public void append(Object obj) {
+final public void append(Object obj) {
 
-   Object[] lastBuffer;
-   int lastBufferIndex;
-   if (bufferArrayList.size() == 0) {
+   //Object[] lastBuffer;
+   //int lastBufferIndex;
+   /*if (bufferArrayList.size == 0) {
        lastBuffer = new Object[pageSize];
        bufferArrayList.add(lastBuffer);
        capacity = pageSize;
    } else {
        lastBufferIndex = Math.min((size>>exp),//+(((size&r)==0)? 0:1), 
-               bufferArrayList.size() - 1);
-       lastBuffer = (Object[]) bufferArrayList.get(lastBufferIndex);
+               bufferArrayList.size - 1);
+       lastBuffer = (Object[]) bufferArrayList.oa[lastBufferIndex];
        //lastBuffer = (int[]) bufferArrayList.get(bufferArrayList.size() - 1);
-   }
-   if ((this.size + 1) <= this.capacity) {
+   }*/
+   if (this.size  < this.capacity) {
        //get the last buffer from the bufferListArray
        //obtain the starting offset in that buffer to which the data is to be copied
        //update length
        //System.arraycopy(long_array, 0, lastBuffer, size % pageSize, long_array.length);
-       lastBuffer[size & r] = obj;
+	   ((Object[])bufferArrayList.oa[size>>exp])[size & r] = obj;
 //       lastBuffer[size % pageSize] = i;
        size += 1;
    } else // new buffers needed
@@ -207,7 +207,7 @@ public void append(Object obj) {
 * Returns the total allocated capacity of this buffer instance.
 * @return int
 */
-public int getCapacity() {
+final public int getCapacity() {
    return capacity;
 }
 /**
@@ -221,7 +221,7 @@ public Object[] getObjectArray(int startingOffset, int len) {
    if (size <= 0 || startingOffset < 0) {
        throw (new IllegalArgumentException());
    }
-   if ((startingOffset + len) > size()) {
+   if ((startingOffset + len) > size) {
        throw (new IndexOutOfBoundsException());
    }
    Object[] result = new Object[len]; // allocate result array
@@ -284,7 +284,7 @@ public Object[] getObjectArray(int startingOffset, int len) {
 * Creation date: (7/17/03 6:38:02 PM)
 * @return int
 */
-public int getPageSize() {
+public final int getPageSize() {
 	return pageSize;
 }
 /**
@@ -292,8 +292,8 @@ public int getPageSize() {
 * @return int
 * @param index int
 */
-public Object objectAt(int index) {
-   if (index < 0 || index > size()-1) {
+public final Object objectAt(int index) {
+   if ( index > size-1) {
        throw new IndexOutOfBoundsException();
    }
 //   int pageNum = (int) index / pageSize;
@@ -308,9 +308,9 @@ public Object objectAt(int index) {
 * @param index int
 * @param newValue int
 */
-public void modifyEntry(int index, Object newValue) {
+public final void modifyEntry(int index, Object newValue) {
 	
-       if (index < 0 || index > size - 1) {
+       if (index > size - 1) {
            throw new IndexOutOfBoundsException();
        }
 
@@ -323,7 +323,7 @@ public void modifyEntry(int index, Object newValue) {
 * Returns the total number of objects in the buffer instance
 * @return int
 */
-public int size() {
+public final int size() {
 	return size;
 }
 /**
@@ -359,7 +359,7 @@ public Object[] toObjectArray() {
  * any unnecessary and additional allocation
  *
  */
-public void clear(){
+public final void clear(){
 	size = 0;
 }
 

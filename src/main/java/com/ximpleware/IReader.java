@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2002-2007 XimpleWare, info@ximpleware.com
+ * Copyright (C) 2002-2012 XimpleWare, info@ximpleware.com
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,4 +40,8 @@ interface IReader {
      */
     boolean skipChar(int ch)
         throws ParseException, EncodingException, EOFException;
+    
+    char decode(int ch);
+    
+    long _getChar(int byte_offset);
 }
