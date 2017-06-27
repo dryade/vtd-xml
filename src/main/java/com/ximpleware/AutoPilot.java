@@ -820,7 +820,7 @@ public void selectXPath(String s) throws XPathParseException {
 
 /**
  * Reset the XPath so the XPath Expression can 
- * be reused and revaluated in anther context position
+ * be reused and revaluated in another context position
  *
  */
 
